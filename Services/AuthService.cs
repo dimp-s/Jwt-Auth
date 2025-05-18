@@ -20,7 +20,9 @@ namespace MyCoursesApp.Services {
         }
 
         public async Task<string?> LoginAsync(LoginDto request) {
-            var user = await _context.Users.FirstOrDefaultAsync(u  => u.Email == request.Email);
+            var user = await _context.Users.
+                Include(u => u.Role).
+                FirstOrDefaultAsync(u  => u.Email == request.Email);
             if (user == null) {
                 return null;
             }
@@ -31,11 +33,15 @@ namespace MyCoursesApp.Services {
             return CreateToken(user);
         }
 
-        public async Task<User> RegisterAsync(RegisterDto request) {
+        public async Task<RegisterDto> RegisterAsync(RegisterDto request) {
 
             if (await _context.Users.AnyAsync(u => u.Email == request.Email)) {
                 return null;
             }
+
+            var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Student");
+            if (defaultRole == null) throw new Exception("Default role not found");
+
 
             var user = new User();
 
@@ -45,33 +51,24 @@ namespace MyCoursesApp.Services {
             user.LastName = request.LastName;
             user.Email = request.Email;
             user.PasswordHash = hashedPassword;
+            user.ProfileImage = request.ProfileImage;
+            user.RoleId = defaultRole.Id;
 
             _context.Users.Add(user);
-            _context.SaveChanges();
-            return user;
-        }
-
-        public async Task<RegisterDto> GetDashboardDataAsync(string id) {
-            if (!Guid.TryParse(id, out var userId)) {
-                return null;
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(s => s.Id == userId);
-
-            if (user == null) return null;
-
+            await _context.SaveChangesAsync();
             return new RegisterDto {
+                Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Email = user.Email,
+                ProfileImage = user.ProfileImage
             };
         }
-
 
         private string CreateToken(User user) {
             var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.Name)
             };
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!

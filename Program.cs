@@ -41,8 +41,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true         
         };
     });
-
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 
 var app = builder.Build();
 
@@ -57,6 +59,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyCoursesApp.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCoursesApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250517183113_RolesTable")]
+    partial class RolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,18 +61,6 @@ namespace MyCoursesApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@admin.com",
-                            FirstName = "Super",
-                            LastName = "Admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMRQf/LxHtOosxwR+/g1ZHhkJyM8X9YP+vVqvojZfzPsgYtGPf7dMpvlG36h0otmXw==",
-                            ProfileImage = "",
-                            RoleId = 1
-                        });
                 });
 
             modelBuilder.Entity("MyCoursesApp.Models.Course", b =>

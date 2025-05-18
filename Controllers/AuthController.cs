@@ -34,13 +34,5 @@ namespace MyCoursesApp.Controllers {
             return Ok( new {token});
         }
 
-        //[Authorize]
-        [HttpGet("dashboard")]
-        public async Task<IActionResult> UserDashboard(string id) {
-            var dashboardData = await _authService.GetDashboardDataAsync(id);
-            if (dashboardData == null)
-                return BadRequest("Not Found");
-            return Ok(dashboardData);
-        }
     }
 }

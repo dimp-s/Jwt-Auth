@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MyCoursesApp.Data;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCoursesApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250516174518_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,26 +53,9 @@ namespace MyCoursesApp.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("RoleId");
-
                     b.ToTable("Users");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "admin@admin.com",
-                            FirstName = "Super",
-                            LastName = "Admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMRQf/LxHtOosxwR+/g1ZHhkJyM8X9YP+vVqvojZfzPsgYtGPf7dMpvlG36h0otmXw==",
-                            ProfileImage = "",
-                            RoleId = 1
-                        });
                 });
 
             modelBuilder.Entity("MyCoursesApp.Models.Course", b =>
@@ -95,10 +81,7 @@ namespace MyCoursesApp.Migrations
             modelBuilder.Entity("MyCoursesApp.Models.Enrollment", b =>
                 {
                     b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("CourseId")
                         .HasColumnType("integer");
@@ -113,49 +96,7 @@ namespace MyCoursesApp.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("Enrollments");
-                });
-
-            modelBuilder.Entity("MyCoursesApp.Models.Role", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Roles");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "Student"
-                        });
-                });
-
-            modelBuilder.Entity("MyCourses.Models.User", b =>
-                {
-                    b.HasOne("MyCoursesApp.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("MyCoursesApp.Models.Enrollment", b =>
@@ -168,7 +109,7 @@ namespace MyCoursesApp.Migrations
 
                     b.HasOne("MyCourses.Models.User", "User")
                         .WithMany("Enrollments")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -185,11 +126,6 @@ namespace MyCoursesApp.Migrations
             modelBuilder.Entity("MyCoursesApp.Models.Course", b =>
                 {
                     b.Navigation("Enrollments");
-                });
-
-            modelBuilder.Entity("MyCoursesApp.Models.Role", b =>
-                {
-                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }
