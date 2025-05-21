@@ -9,15 +9,17 @@ namespace MyCoursesApp.Controllers {
     [ApiController]
     public class EnrollmentController : ControllerBase {
         private readonly IEnrollmentService _enrollmentService;
+        private readonly IUserContextService _userContextService;
 
-        public EnrollmentController(IEnrollmentService enrollmentService) {
+        public EnrollmentController(IEnrollmentService enrollmentService, IUserContextService userContextService) {
             _enrollmentService = enrollmentService;
+            _userContextService = userContextService;
         }
 
         [Authorize]
         [HttpGet("mycourses")]
         public async Task<IActionResult> GetMyCourses() {
-            var studentId = GetCurrentStudentId();
+            var studentId = _userContextService.GetCurrentStudentId();
             if (studentId == null)
                 return Unauthorized(new { message = "Invalid Student ID in token." });
 
@@ -29,7 +31,7 @@ namespace MyCoursesApp.Controllers {
         [Authorize]
         [HttpPost("enroll/{courseId:int}")]
         public async Task<IActionResult> EnrollInCourse(int courseId) {
-            var studentId = GetCurrentStudentId();
+            var studentId = _userContextService.GetCurrentStudentId();
             if (studentId == null)
                 return Unauthorized(new { message = "Invalid Student ID in token." });
 
@@ -42,14 +44,14 @@ namespace MyCoursesApp.Controllers {
             return Ok(new { message = "Enrollment successful." });
         }
 
-        private int? GetCurrentStudentId() {
-            var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //private int? GetCurrentStudentId() {
+        //    var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (int.TryParse(studentIdClaim, out var studentId))
-                return studentId;
+        //    if (int.TryParse(studentIdClaim, out var studentId))
+        //        return studentId;
 
-            return null;
-        }
+        //    return null;
+        //}
 
     }
 }
