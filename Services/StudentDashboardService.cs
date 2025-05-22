@@ -27,6 +27,7 @@ namespace MyCoursesApp.Services {
                     CourseId = e.CourseId,
                     Name = e.Course.Name,
                     CreditHours = e.Course.CreditHours,
+                    Description = e.Course.Description,
                     EnrolledOn = e.EnrolledOn
                 }).ToList()
             };
