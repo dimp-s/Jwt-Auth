@@ -3,6 +3,6 @@
 namespace MyCoursesApp.Services.Interfaces {
     public interface IStudentDashboardService {
         Task<StudentDashboardDto> GetDashboardDataAsync(int? studentId);
-        Task<String> UploadProfilePhotoAsync(string studentId, IFormFile profileImage);
+        Task<String> UploadProfilePhotoAsync(int? studentId, IFormFile profileImage);
     }
 }

@@ -99,6 +99,8 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 
+app.MapStaticAssets();
+
 app.MapControllers();
 
 app.Run();

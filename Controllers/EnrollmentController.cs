@@ -16,7 +16,7 @@ namespace MyCoursesApp.Controllers {
             _userContextService = userContextService;
         }
 
-        [Authorize]
+        [Authorize(Roles ="Student")]
         [HttpGet("mycourses")]
         public async Task<IActionResult> GetMyCourses() {
             var studentId = _userContextService.GetCurrentStudentId();
@@ -28,7 +28,7 @@ namespace MyCoursesApp.Controllers {
             return Ok(new { message = "Courses retrieved", data = courses });
         }
 
-        [Authorize]
+        [Authorize(Roles = "Student")]
         [HttpPost("enroll/{courseId:int}")]
         public async Task<IActionResult> EnrollInCourse(int courseId) {
             var studentId = _userContextService.GetCurrentStudentId();
