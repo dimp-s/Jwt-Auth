@@ -42,6 +42,7 @@ namespace MyCoursesApp.Services {
                 CourseId = course.Id,
                 CourseName = course.Name,
                 CreditHours = course.CreditHours,
+                Description = course.Description,
                 IsEnrolled = enrolledCourseIds.Contains(course.Id)
             }).ToList();
         }

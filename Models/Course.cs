@@ -7,6 +7,8 @@ namespace MyCoursesApp.Models {
         public required string Name { get; set; }
         [Required]
         public int CreditHours { get; set; }
+
+        public string Description { get; set; }
         public virtual ICollection<Enrollment> Enrollments { get; set; }
     }
 }

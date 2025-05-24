@@ -9,8 +9,10 @@
             public int CourseId { get; set; }
             public string Name { get; set; }
             public int CreditHours { get; set; }
+            public string Description { get; set; }
             //public DateTime EnrolledOn { get; set; }
             public DateTime EnrolledOn { get; set; }
+
         }
     }
 }

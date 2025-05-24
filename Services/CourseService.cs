@@ -13,7 +13,7 @@ namespace MyCoursesApp.Services {
         }
 
         public async Task CreateAsync(CourseDto course) {
-            var newCourse = new Course { Name = course.Name, CreditHours = course.CreditHours };
+            var newCourse = new Course { Name = course.Name, CreditHours = course.CreditHours, Description = course.Description };
             _context.Courses.Add(newCourse);
             await _context.SaveChangesAsync();
         }
@@ -43,6 +43,7 @@ namespace MyCoursesApp.Services {
             if (updated != null) {
                 updated.Name = course.Name;
                 updated.CreditHours = course.CreditHours;
+                updated.Description = course.Description;
                 await _context.SaveChangesAsync();
             }
         }

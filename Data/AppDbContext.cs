@@ -39,6 +39,13 @@ namespace MyCoursesApp.Data {
             };
 
             modelBuilder.Entity<User>().HasData(adminUser);
+
+            //seeding courses
+            modelBuilder.Entity<Course>().HasData(
+             new Course { Id = 1, Name = "Intro to Java", CreditHours = 8, Description = "Beginner friendly course to learn JAVA programming. Get Started now with improved lessons." },
+             new Course { Id = 2, Name = "Intro to C#", CreditHours = 4, Description = "Beginner friendly course to learn c# programming. Get Started now with improved lessons." },
+             new Course { Id = 3, Name = "AWS Beginner Pack", CreditHours = 12, Description = "Beginner friendly course to start with AWS. Get Started now with improved lessons." }
+             );
         }
     }
 }

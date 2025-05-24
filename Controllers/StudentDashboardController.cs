@@ -30,9 +30,25 @@ namespace MyCoursesApp.Controllers {
                 return Ok(new { message = "Dashboard Data recieved", data = dashboardData });
             }
             catch (Exception ex) {
-                return StatusCode(500, new { message = "Error occured in deleting course", error = ex.Message });
+                return StatusCode(500, new { message = "Error occured in retrieving dashboard data.", error = ex.Message });
             }
 
+        }
+        [Authorize]
+        [HttpPost("upload-photo")]
+        public async Task<IActionResult> UploadProfileImage(IFormFile profileImage) {
+            try {
+                var userId = _userContextService.GetCurrentStudentId();
+                if (userId == null) return Unauthorized(new { message = "Invalid Student ID in token." });
+
+                var imgUrl = await _studentDashboardService.UploadProfilePhotoAsync(userId, profileImage);
+                if (imgUrl == null) return NotFound(new { message = "Not Found!" });
+
+                return Ok(new { message = "Image Uploaded", data = imgUrl });
+            }
+            catch (Exception ex) {
+                return StatusCode(500, new { message = "Error occured in deleting course", error = ex.Message });
+            }
         }
 
     }

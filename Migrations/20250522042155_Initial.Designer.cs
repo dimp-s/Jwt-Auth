@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MyCoursesApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250517183113_RolesTable")]
-    partial class RolesTable
+    [Migration("20250522042155_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,6 +61,18 @@ namespace MyCoursesApp.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@admin.com",
+                            FirstName = "Super",
+                            LastName = "Admin",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMRQf/LxHtOosxwR+/g1ZHhkJyM8X9YP+vVqvojZfzPsgYtGPf7dMpvlG36h0otmXw==",
+                            ProfileImage = "",
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("MyCoursesApp.Models.Course", b =>
@@ -74,6 +86,10 @@ namespace MyCoursesApp.Migrations
                     b.Property<int>("CreditHours")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -81,6 +97,29 @@ namespace MyCoursesApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Courses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreditHours = 8,
+                            Description = "Beginner friendly course to learn JAVA programming. Get Started now with improved lessons.",
+                            Name = "Intro to Java"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreditHours = 4,
+                            Description = "Beginner friendly course to learn c# programming. Get Started now with improved lessons.",
+                            Name = "Intro to C#"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreditHours = 12,
+                            Description = "Beginner friendly course to start with AWS. Get Started now with improved lessons.",
+                            Name = "AWS Beginner Pack"
+                        });
                 });
 
             modelBuilder.Entity("MyCoursesApp.Models.Enrollment", b =>
