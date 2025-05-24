@@ -30,6 +30,13 @@ namespace MyCoursesApp.Services {
             return true;
         }
 
+        public async Task<bool> DropCourseAsync(int studentId, int courseId) {
+            var result = await _context.Enrollments.FirstOrDefaultAsync(e => e.UserId ==  studentId && e.CourseId == courseId);
+            if(result == null) return false;
+            _context.Enrollments.Remove(result);
+            await _context.SaveChangesAsync();
+            return true;
+        }
         public async Task<List<EnrollmentDto>> GetAvailableCoursesAsync(int studentId) {
             var enrolledCourseIds = await _context.Enrollments
             .Where(e => e.UserId == studentId)
