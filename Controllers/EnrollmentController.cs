@@ -73,6 +73,22 @@ namespace MyCoursesApp.Controllers {
             }
         }
 
+        [Authorize(Roles = "Student")]
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchCourses([FromQuery] string query) {
+            try {
+                var studentId = _userContextService.GetCurrentStudentId();
+                if (studentId == null)
+                    return Unauthorized(new { message = "Invalid student ID in token." });
+
+                var results = await _enrollmentService.SearchCoursesAsync(studentId.Value, query);
+                return Ok(new { message = "Search results retrieved.", data = results });
+            }
+            catch {
+                return StatusCode(500, new {message = "Search failed!." });
+            }
+        }
+
         //private int? GetCurrentStudentId() {
         //    var studentIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 

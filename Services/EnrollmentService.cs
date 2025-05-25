@@ -53,5 +53,26 @@ namespace MyCoursesApp.Services {
                 IsEnrolled = enrolledCourseIds.Contains(course.Id)
             }).ToList();
         }
+
+        public async Task<List<EnrollmentDto>> SearchCoursesAsync(int studentId, string query) {
+            var lowerQuery = query.ToLower();
+            var enrolledCoursesIds = await _context.Enrollments.
+                Where(e => e.UserId == studentId).
+                Select(e => e.CourseId)
+                .ToListAsync();
+            var matchingCourses = await _context.Courses
+                .Where(c =>
+                c.Name.ToLower().Contains(lowerQuery) ||
+                c.Description.ToLower().Contains(lowerQuery))
+                .ToListAsync();
+
+            return matchingCourses.Select(course => new EnrollmentDto {
+                CourseId = course.Id,
+                CourseName = course.Name,
+                CreditHours = course.CreditHours,
+                Description = course.Description,
+                IsEnrolled = enrolledCoursesIds.Contains(course.Id)
+            }).ToList();
+        }
     }
 }
