@@ -19,16 +19,20 @@ namespace MyCoursesApp.Controllers {
 
         [HttpPost("register")]
         public async Task<ActionResult<User>> Register(RegisterDto request) {
-            var user = await _authService.RegisterAsync(request);
-            if (user == null) return BadRequest("User already Exists!");
-            return Ok(user);
+            var result = await _authService.RegisterAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDto request) {
-            var token = await _authService.LoginAsync(request);
-            if (token == null) return BadRequest("Invalid Username or Password");
-            return Ok( new {token});
+            var result = await _authService.LoginAsync(request);
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
     }

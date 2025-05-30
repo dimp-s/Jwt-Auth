@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyCourses.Models;
+using MyCoursesApp.Commons;
 using MyCoursesApp.Data;
 using MyCoursesApp.Models.Dtos;
 using MyCoursesApp.Services.Interfaces;
@@ -19,49 +20,52 @@ namespace MyCoursesApp.Services {
             _configuration = configuration;
         }
 
-        public async Task<string?> LoginAsync(LoginDto request) {
-            var user = await _context.Users.
-                Include(u => u.Role).
-                FirstOrDefaultAsync(u  => u.Email == request.Email);
-            if (user == null) {
-                return null;
-            }
-            if (new PasswordHasher<User>().
-                VerifyHashedPassword(user, user.PasswordHash, request.PasswordHash)
-                == PasswordVerificationResult.Failed)
-                return null;
-            return CreateToken(user);
+        public async Task<ResultType<object>> LoginAsync(LoginDto request) {
+            var user = await _context.Users.Include(u => u.Role)
+            .FirstOrDefaultAsync(u => u.Email == request.Email);
+
+            if (user == null)
+                return ResultType<object>.Fail("Invalid email or password.");
+
+            var passwordValid = new PasswordHasher<User>()
+                .VerifyHashedPassword(user, user.PasswordHash, request.PasswordHash);
+
+            if (passwordValid == PasswordVerificationResult.Failed)
+                return ResultType<object>.Fail("Invalid email or password.");
+
+            var token = CreateToken(user);
+            return ResultType<object>.Ok(new { token } , "Login successful.");
         }
 
-        public async Task<RegisterDto> RegisterAsync(RegisterDto request) {
+        public async Task<ResultType<RegisterDto>> RegisterAsync(RegisterDto request) {
 
-            if (await _context.Users.AnyAsync(u => u.Email == request.Email)) {
-                return null;
-            }
+            if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                return ResultType<RegisterDto>.Fail("Email is already registered.");
 
             var defaultRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == "Student");
-            if (defaultRole == null) throw new Exception("Default role not found");
+            if (defaultRole == null)
+                return ResultType<RegisterDto>.Fail("Default role not found.");
 
-
-            var user = new User();
-
-            var hashedPassword = new PasswordHasher<User>()
-            .HashPassword(user, request.PasswordHash);
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.Email = request.Email;
-            user.PasswordHash = hashedPassword;
-            user.ProfileImage = request.ProfileImage;
-            user.RoleId = defaultRole.Id;
+            var user = new User {
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Email = request.Email,
+                PasswordHash = new PasswordHasher<User>().HashPassword(null!, request.PasswordHash),
+                ProfileImage = request.ProfileImage,
+                RoleId = defaultRole.Id
+            };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-            return new RegisterDto {
+
+            var responseDto = new RegisterDto {
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 ProfileImage = user.ProfileImage
             };
+
+            return ResultType<RegisterDto>.Ok(responseDto, "Registration successful.");
         }
 
         private string CreateToken(User user) {

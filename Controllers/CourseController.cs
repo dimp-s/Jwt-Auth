@@ -17,32 +17,19 @@ namespace MyCoursesApp.Controllers {
         // GET: Courses
         [HttpGet]
         public async Task<IActionResult> Index() {
-
-            try {
-                var courses = await _courseService.GetAllAsync();
-                if (courses == null || !courses.Any())
-                    return Ok(new { message = "No Courses found!" });
-                return Ok(new { message = "All Courses Returned", data = courses });
-            } catch (Exception ex) {
-                return StatusCode(500, new { message= "An Error occured!", ex.Message});
-            }
-            
+            var result = await _courseService.GetAllAsync();
+            return result.Success
+                ? Ok(result)
+                : NotFound(result);
         }
 
         // GET: Courses/Details/5
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Details(int? id) {
-            try {
-                var course = await _courseService.GetDetailsAsync(id);
-                if(course == null) {
-                    return NotFound(new { message = "Course Not Found!" });
-                }
-                return Ok(new { message = "Course retrieved!", data = course });
-
-            }
-            catch (Exception ex) {
-                return StatusCode(500, new { message = $"An error occurred while retrieving!", error = ex.Message });
-            }
+            var result = await _courseService.GetDetailsAsync(id);
+            return result.Success
+                ? Ok(result)
+                : NotFound(result);
         }
 
 
@@ -59,15 +46,13 @@ namespace MyCoursesApp.Controllers {
             //    return RedirectToAction(nameof(Index));
             //}
             //return View(course);
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            try {
-                await _courseService.CreateAsync(course);
-                return Ok(new { message = "Course Created", course });
-            }
-            catch (Exception ex) { 
-                return StatusCode(500, new { message= "An error occured!",error = ex.Message });
-            }
+
+            var result = await _courseService.CreateAsync(course);
+            return result.Success
+                ? Ok(result)
+                : BadRequest(result);
         }
 
         // POST: Courses/Edit/5
@@ -75,38 +60,33 @@ namespace MyCoursesApp.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         //[ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Edit(int id, CourseDto updatedCourse) {
-            if (!ModelState.IsValid) {
+            if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            }
-            try {
-                var course = await _courseService.GetDetailsAsync(id);
-                if (course == null) {
-                    return NotFound(new { message = "Course Not Found!" });
-                }
-                await _courseService.UpdateAsync(id, updatedCourse);
-                return Ok(new { message = "Course Updated!" });
 
-            }
-            catch (Exception ex) {
-                return StatusCode(500, new { message = "An error occured when Updating the course", error = ex.Message });
-            }
+            var existsResult = await _courseService.GetDetailsAsync(id);
+            if (!existsResult.Success)
+                return NotFound(existsResult);
+
+            var result = await _courseService.UpdateAsync(id, updatedCourse);
+            return result.Success
+                ? Ok(result)
+                : BadRequest(result);
         }
 
         // POST: Courses/Delete/5
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         //[ValidateAntiForgeryToken]
         //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id) {
-            try {
-                await _courseService.DeleteAsync(id);
-                return Ok(new { message = "Course deleted!" });
-            }
-            catch (Exception ex) {
-                return StatusCode(500, new { message = "Error occured in deleting course", error = ex.Message });
-            }
-            }
+            var result = await _courseService.DeleteAsync(id);
+            return result.Success
+                ? Ok(result)
+                : NotFound(result);
+        }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("admin-only")]
